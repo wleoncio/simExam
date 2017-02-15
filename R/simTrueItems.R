@@ -40,41 +40,44 @@ simTrueItems <- function(I, C, T, min.a = .8, max.a = 1.2, mu.b = 0, sd.b = 1)
     true.item.parms.short    <- list(true.item.parms[, 1:2])  # for future ref.
   }
 
-  # Forms 2:T are directly linked to one of their previous forms
-  unique.i <- I - C
-  for (t in 2:T)
+  if (T > 1)
   {
-    linked.form    <- sample(x = 1:(t - 1), size = 1)
-    if (T > 2) cat("Form", t, "is directly linked to form", linked.form, "\n")
-    first.unique.i <- (I + 1) + unique.i * (t - 2)
-    last.unique.i  <- first.unique.i + unique.i - 1
-    a.col <- 2 * t - 1
-    b.col <- a.col + 1
-    for (i in first.unique.i:last.unique.i)
+    # Forms 2:T are directly linked to one of their previous forms
+    unique.i <- I - C
+    for (t in 2:T)
     {
-      # Generates unique items
-      true.item.parms[i, a.col] <- gen.a()
-      true.item.parms[i, b.col] <- gen.b()
-    }
+      linked.form    <- sample(x = 1:(t - 1), size = 1)
+      if (T > 2) cat("Form", t, "is directly linked to form", linked.form, "\n")
+      first.unique.i <- (I + 1) + unique.i * (t - 2)
+      last.unique.i  <- first.unique.i + unique.i - 1
+      a.col <- 2 * t - 1
+      b.col <- a.col + 1
+      for (i in first.unique.i:last.unique.i)
+      {
+        # Generates unique items
+        true.item.parms[i, a.col] <- gen.a()
+        true.item.parms[i, b.col] <- gen.b()
+      }
 
-    # Takes some items from linked form
-    if (linked.form == 1)
-    {
-      first.unique.linked <- 1
-      last.unique.linked  <- I
+      # Takes some items from linked form
+      if (linked.form == 1)
+      {
+        first.unique.linked <- 1
+        last.unique.linked  <- I
+      }
+      else
+      {
+        first.unique.linked <- (I + 1) + unique.i * (linked.form - 2)
+        last.unique.linked  <- first.unique.linked + unique.i - 1
+      }
+      items.linked <- true.item.parms[first.unique.linked:last.unique.linked, ]
+      common.i <- sample(row.names(items.linked), C)
+      true.item.parms[common.i, a.col] <- true.item.parms[common.i,
+                                                          paste0(linked.form, "a")]
+      true.item.parms[common.i, b.col] <- true.item.parms[common.i,
+                                                          paste0(linked.form, "b")]
+      true.item.parms.short[[t]]       <- true.item.parms[, a.col:b.col]
     }
-    else
-    {
-      first.unique.linked <- (I + 1) + unique.i * (linked.form - 2)
-      last.unique.linked  <- first.unique.linked + unique.i - 1
-    }
-    items.linked <- true.item.parms[first.unique.linked:last.unique.linked, ]
-    common.i <- sample(row.names(items.linked), C)
-    true.item.parms[common.i, a.col] <- true.item.parms[common.i,
-                                                        paste0(linked.form, "a")]
-    true.item.parms[common.i, b.col] <- true.item.parms[common.i,
-                                                        paste0(linked.form, "b")]
-    true.item.parms.short[[t]]       <- true.item.parms[, a.col:b.col]
   }
 
   for (t in 1:T)
