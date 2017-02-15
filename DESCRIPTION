@@ -1,0 +1,10 @@
+Package: irtExam
+Type: Package
+Title: Generate simulated data for IRT-enabled exams
+Version: 0.0.0.9000 
+Author: Waldir Leoncio <waldir.leoncio@gmail.com>
+Maintainer: Waldir Leoncio <waldir.leoncio@gmail.com>
+Description: This package simulates test results for IRT applications.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
