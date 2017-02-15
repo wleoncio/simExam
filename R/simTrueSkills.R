@@ -21,5 +21,7 @@ simTrueSkills <- function(E, T, mu.skill, sd.skill)
       true.skills[e, t] <- rnorm(n = 1, mean = mu.skill[t], sd = sd.skill[t])
     }
   }
+  rownames(true.skills) <- paste0("e", 1:E)
+  colnames(true.skills) <- paste0("t", 1:T)
   return(true.skills)
 }
