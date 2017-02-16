@@ -1,10 +1,13 @@
-#' Simulate true item parameters
+#' Generate true item parameters for NEAT design
 #'
 #' @description Creates true item parameters for a 2-parameters IRT model for
 #'   posterior generation of item responses, IRT implementation and equating.
+#'   Compatible with the common-item, non-equivalent group design (see Kolen et.
+#'   al. 2004).
 #'
-#' @param I number of items per form
 #' @param C number of common items between two forms
+#' @param I number of items per form
+#' @param U number of unique items per form (only valid for external anchor)
 #' @param T number of forms
 #' @param min.a Lower bound for the (uniform) distribution of item
 #'   discrimination parameter
@@ -13,96 +16,26 @@
 #' @param mu.b Mean of (normally-distributed) item difficulty parameter
 #' @param sd.b Standard deviation of (normally-distributed) item difficulty
 #'   parameter
-#' @param separate.anchor Separates (internal) anchor items as a different exam?
-#'   Differs from external anchor designs and may generate items with no unique
-#'   items.
+#' @param anchor.type type of anchor item set ("internal" or "external")
+#' @param output type of output; "list" gives a list of used items per form,
+#'   "matrix" gives a joint matrix (data.frame).
 #'
 #' @return List of true item parameters per form
 #' @author Waldir Leoncio
 #' @export
 
-genTrueItems <- function(I, C, T, min.a = .5, max.a = 2, mu.b = 0, sd.b = 1,
-                         separate.anchor = FALSE)
+genTrueItems <- function(C, U, I, T, min.a = .5, max.a = 2, mu.b = 0, sd.b = 1,
+                         anchor.type = "internal", output = "list")
 {
-  # Distributions of parameters
-  gen.a <- function() runif(n = 1, min = min.a, max = max.a)
-  gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
-
-  # Generation of true item parameters --------------------------------------
-  total.unique.items <- I * T - (C * (T - 1))
-  true.item    <- matrix(nrow = total.unique.items, ncol = 2 * T)
-  rownames(true.item) <- paste0("i", formatC(1:total.unique.items,
-                                                   flag = "0", width = 2))
-  colnames(true.item) <- paste0(rep(1:T, each = 2), rep(letters[1:2], T))
-
-  # First form only has unique items
-  for (i in 1:I)
+  # Generate item bank
+  if (anchor.type == "internal")
   {
-    true.item[i, "1a"] <- gen.a()
-    true.item[i, "1b"] <- gen.b()
-    true.item.short    <- list(true.item[, 1:2])  # for future ref.
-    names(true.item.short) <- "t1"
+    true.items <- genItemBankInt(C, I, T, min.a, max.a, mu.b, sd.b)
   }
-
-  if (T > 1)
+  else
   {
-    # Forms 2:T are directly linked to one of their previous forms
-    unique.i <- I - C
-    for (t in 2:T)
-    {
-      linked.form    <- sample(x = 1:(t - 1), size = 1)
-      if (T > 2) cat("Form", t, "is directly linked to form", linked.form, "\n")
-      first.unique.i <- (I + 1) + unique.i * (t - 2)
-      last.unique.i  <- first.unique.i + unique.i - 1
-      a.col <- 2 * t - 1
-      b.col <- a.col + 1
-      for (i in first.unique.i:last.unique.i)
-      {
-        # Generates unique items
-        true.item[i, a.col] <- gen.a()
-        true.item[i, b.col] <- gen.b()
-      }
-
-      # Takes some items from linked form
-      if (linked.form == 1)
-      {
-        first.unique.linked <- 1
-        last.unique.linked  <- I
-      }
-      else
-      {
-        first.unique.linked <- (I + 1) + unique.i * (linked.form - 2)
-        last.unique.linked  <- first.unique.linked + unique.i - 1
-      }
-      items.linked <- true.item[first.unique.linked:last.unique.linked, ]
-      common.i <- sort(sample(row.names(items.linked), C))
-      true.item[common.i, a.col] <- true.item[common.i, paste0(linked.form, "a")]
-      true.item[common.i, b.col] <- true.item[common.i, paste0(linked.form, "b")]
-
-      current.name <- paste0("t", t)
-      if (separate.anchor)
-      {
-        linked.name <- paste0("t", linked.form)
-        anchor.name <- paste0("t", t, "t", linked.form)
-        true.item.short[[current.name]] <- true.item[first.unique.i:last.unique.i,
-                                                     a.col:b.col]
-        true.item.short[[anchor.name]]  <- true.item[common.i, ]
-        linked.unique <- -na.omit(match(c(rownames(true.item.short[[current.name]]),
-                                          rownames(true.item.short[[anchor.name]])),
-                                        rownames(true.item.short[[linked.name]])))
-        true.item.short[[linked.name]]  <- true.item.short[[linked.name]][linked.unique, ]
-      }
-      else
-      {
-        true.item.short[[current.name]] <- true.item[, a.col:b.col]
-        for (t in 1:T)
-        {
-          present.items <- complete.cases(true.item.short[[t]])
-          true.item.short[[t]] <- true.item.short[[t]][present.items, ]
-        }
-        names(true.item.short) <- paste0("t", 1:T)
-      }
-    }
+    if (missing(U)) U <- I - C
+    true.items <- genItemBankExt(C, U, T, min.a, max.a, mu.b, sd.b)
   }
-  return(true.item.short)
+  return(true.items[[output]])
 }

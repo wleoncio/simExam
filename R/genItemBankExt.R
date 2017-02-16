@@ -1,0 +1,54 @@
+#' Generate item bank for NEAT with external anchor items
+#'
+#' @param C number of common items between two forms
+#' @param U number of unique items per form
+#' @param min.a Lower bound for the (uniform) distribution of item
+#'   discrimination parameter
+#' @param max.a Upper bound for the (uniform) distribution of item
+#'   discrimination parameter
+#' @param mu.b Mean of (normally-distributed) item difficulty parameter
+#' @param sd.b Standard deviation of (normally-distributed) item difficulty
+#'   parameter
+#'
+#' @return list containing 2PL item parameters per form
+#' @export
+genItemBankExt <- function(C, U, T, min.a, max.a, mu.b, sd.b) {
+  # Distributions of parameters
+  gen.a <- function() runif(n = 1, min = min.a, max = max.a)
+  gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
+
+  # Check if I or U was determined
+  total.U <- (U * T + C)
+  total.T <- T + 1
+  all.T   <- c(1:T, 0)  # form with anchor items = t0
+
+  # Create empty aggregated item bank
+  true.items           <- matrix(nrow = total.U, ncol = 2 * T + 2)
+  true.items.short     <- list()
+  rownames(true.items) <- paste0("i", formatC(1:total.U, flag = "0", width = 3))
+  colnames(true.items) <- paste0(rep(all.T, each = 2), letters[1:2])
+
+  # Generate unique items for all forms except 0 (with anchor/common items)
+  for (t in 1:T)
+  {
+    first.u <- (t - 1) * U + 1
+    last.u  <- t * U
+    a.col   <- 2 * t - 1
+    b.col   <- a.col + 1
+    for (u in first.u:last.u)
+    {
+      true.items[u, paste0(t, "a")] <- gen.a()
+      true.items[u, paste0(t, "b")] <- gen.b()
+    }
+    true.items.short[[t]] <- true.items[first.u:last.u, a.col:b.col]
+  }
+
+  # Common items
+  true.items[(total.U - C + 1):total.U, ] <- c(gen.a(), gen.b())
+  rows.common <- (total.U - C + 1):total.U
+  cols.common <- (total.T * 2 - 1):(total.T * 2)
+  true.items.short[[total.T]] <- true.items[rows.common, cols.common]
+  names(true.items.short) <- paste0("t", all.T)
+  output <- list("matrix" = true.items, "list" = true.items.short)
+  return(output)
+}
