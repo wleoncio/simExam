@@ -13,15 +13,16 @@
 #' @param mu.b Mean of (normally-distributed) item difficulty parameter
 #' @param sd.b Standard deviation of (normally-distributed) item difficulty
 #'   parameter
-#'@param separate.anchor separates anchor items as a different exam
+#' @param separate.anchor Separates (internal) anchor items as a different exam?
+#'   Differs from external anchor designs and may generate items with no unique
+#'   items.
 #'
 #' @return List of true item parameters per form
 #' @author Waldir Leoncio
 #' @export
 
-genTrueItems <- function(I, C, T, min.a = .8, max.a = 1.2, mu.b = 0, sd.b = 1,
+genTrueItems <- function(I, C, T, min.a = .5, max.a = 2, mu.b = 0, sd.b = 1,
                          separate.anchor = FALSE)
-  # TODO: change gen.a range to .5--2? See Andersson & Wiberg, 2016
 {
   # Distributions of parameters
   gen.a <- function() runif(n = 1, min = min.a, max = max.a)
@@ -29,18 +30,18 @@ genTrueItems <- function(I, C, T, min.a = .8, max.a = 1.2, mu.b = 0, sd.b = 1,
 
   # Generation of true item parameters --------------------------------------
   total.unique.items <- I * T - (C * (T - 1))
-  true.item.parms    <- matrix(nrow = total.unique.items, ncol = 2 * T)
-  rownames(true.item.parms) <- paste0("i", formatC(1:total.unique.items,
+  true.item    <- matrix(nrow = total.unique.items, ncol = 2 * T)
+  rownames(true.item) <- paste0("i", formatC(1:total.unique.items,
                                                    flag = "0", width = 2))
-  colnames(true.item.parms) <- paste0(rep(1:T, each = 2), rep(letters[1:2], T))
+  colnames(true.item) <- paste0(rep(1:T, each = 2), rep(letters[1:2], T))
 
   # First form only has unique items
   for (i in 1:I)
   {
-    true.item.parms[i, "1a"] <- gen.a()
-    true.item.parms[i, "1b"] <- gen.b()
-    true.item.parms.short    <- list(true.item.parms[, 1:2])  # for future ref.
-    names(true.item.parms.short) <- "t1"
+    true.item[i, "1a"] <- gen.a()
+    true.item[i, "1b"] <- gen.b()
+    true.item.short    <- list(true.item[, 1:2])  # for future ref.
+    names(true.item.short) <- "t1"
   }
 
   if (T > 1)
@@ -58,8 +59,8 @@ genTrueItems <- function(I, C, T, min.a = .8, max.a = 1.2, mu.b = 0, sd.b = 1,
       for (i in first.unique.i:last.unique.i)
       {
         # Generates unique items
-        true.item.parms[i, a.col] <- gen.a()
-        true.item.parms[i, b.col] <- gen.b()
+        true.item[i, a.col] <- gen.a()
+        true.item[i, b.col] <- gen.b()
       }
 
       # Takes some items from linked form
@@ -73,35 +74,35 @@ genTrueItems <- function(I, C, T, min.a = .8, max.a = 1.2, mu.b = 0, sd.b = 1,
         first.unique.linked <- (I + 1) + unique.i * (linked.form - 2)
         last.unique.linked  <- first.unique.linked + unique.i - 1
       }
-      items.linked <- true.item.parms[first.unique.linked:last.unique.linked, ]
+      items.linked <- true.item[first.unique.linked:last.unique.linked, ]
       common.i <- sort(sample(row.names(items.linked), C))
-      true.item.parms[common.i, a.col] <- true.item.parms[common.i,
-                                                          paste0(linked.form, "a")]
-      true.item.parms[common.i, b.col] <- true.item.parms[common.i,
-                                                          paste0(linked.form, "b")]
+      true.item[common.i, a.col] <- true.item[common.i, paste0(linked.form, "a")]
+      true.item[common.i, b.col] <- true.item[common.i, paste0(linked.form, "b")]
 
       current.name <- paste0("t", t)
       if (separate.anchor)
       {
-        # TODO: fix not working for T > 2 linked to form other than T1
         linked.name <- paste0("t", linked.form)
         anchor.name <- paste0("t", t, "t", linked.form)
-        linked.unique <- rownames(true.item.parms[first.unique.linked:last.unique.linked, ])
-        true.item.parms.short[[current.name]] <- true.item.parms[first.unique.i:last.unique.i, a.col:b.col]
-        true.item.parms.short[[anchor.name]]  <- true.item.parms[common.i, ]
-        true.item.parms.short[[linked.name]]  <- true.item.parms.short[[linked.name]][-na.omit(match(c(rownames(true.item.parms.short[[current.name]]), rownames(true.item.parms.short[[anchor.name]])), rownames(true.item.parms.short[[linked.name]]))), ]
+        true.item.short[[current.name]] <- true.item[first.unique.i:last.unique.i,
+                                                     a.col:b.col]
+        true.item.short[[anchor.name]]  <- true.item[common.i, ]
+        linked.unique <- -na.omit(match(c(rownames(true.item.short[[current.name]]),
+                                          rownames(true.item.short[[anchor.name]])),
+                                        rownames(true.item.short[[linked.name]])))
+        true.item.short[[linked.name]]  <- true.item.short[[linked.name]][linked.unique, ]
       }
       else
       {
-        true.item.parms.short[[current.name]] <- true.item.parms[, a.col:b.col]
+        true.item.short[[current.name]] <- true.item[, a.col:b.col]
         for (t in 1:T)
         {
-          present.items <- complete.cases(true.item.parms.short[[t]])
-          true.item.parms.short[[t]] <- true.item.parms.short[[t]][present.items, ]
+          present.items <- complete.cases(true.item.short[[t]])
+          true.item.short[[t]] <- true.item.short[[t]][present.items, ]
         }
-        names(true.item.parms.short) <- paste0("t", 1:T)
+        names(true.item.short) <- paste0("t", 1:T)
       }
     }
   }
-  return(true.item.parms.short)
+  return(true.item.short)
 }
