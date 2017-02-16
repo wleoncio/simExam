@@ -9,8 +9,8 @@
 #' @return List of size equal to the number of forms. Each element of the list
 #'   contains a matrix of dichotomic answers (right or wrong) per examinee and
 #'   item.
-simExam <- function(true.item.parms = simTrueItems(),
-                    true.skills     = simTrueSkills())
+genExam <- function(true.item.parms = genTrueItems(),
+                    true.skills     = genTrueSkills())
 {
   # Generation of results for all administrations ---------------------------
   E <- nrow(true.skills)
@@ -32,6 +32,7 @@ simExam <- function(true.item.parms = simTrueItems(),
       }
     }
     colnames(test.scores[[t]]) <- rownames(true.item.parms[[t]])
+    rownames(test.scores[[t]]) <- rownames(true.skills)
     total.scores[, t] <- rowSums(test.scores[[t]])
   }
   names(test.scores) <- paste0("t", 1:T)
