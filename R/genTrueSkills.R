@@ -11,7 +11,7 @@
 #' @return Matrix of examinee skill per form
 #' @export
 #'
-genTrueSkills <- function(E, T, mu.skill, sd.skill)
+genTrueSkills <- function(E, T, mu.skill = rep(0, T), sd.skill = rep(1, T))
 {
   true.skills <- matrix(nrow = E, ncol = T)
   for (e in 1:E)
