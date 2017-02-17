@@ -17,7 +17,6 @@ genItemBankInt <- function(C, I, T, min.a, max.a, mu.b, sd.b) {
   gen.a <- function() runif(n = 1, min = min.a, max = max.a)
   gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
 
-  # Check if I or U was determined
   total.U <- I * T - (C * (T - 1))
 
   # Create empty aggregated item bank
