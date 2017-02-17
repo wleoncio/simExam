@@ -49,6 +49,13 @@ genItemBankExt <- function(C, U, T, min.a, max.a, mu.b, sd.b) {
   cols.common <- (total.T * 2 - 1):(total.T * 2)
   true.items.short[[total.T]] <- true.items[rows.common, cols.common]
   names(true.items.short) <- paste0("t", all.T)
+  if (length(rows.common) == 1)  # works around bug for C = 1 (item has no name)
+  {
+    true.items.short[["t0"]] <- matrix(true.items.short[["t0"]],
+                                       nrow     = 1,
+                                       dimnames = list(rownames(true.items)[nrow(true.items)],
+                                                       c("0a", "0b")))
+  }
   output <- list("matrix" = true.items, "list" = true.items.short)
   return(output)
 }
