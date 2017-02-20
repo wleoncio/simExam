@@ -5,11 +5,12 @@
 #'
 #' @param true.item.parms true item parameters per form
 #' @param true.skills     true examinee skill per form
+#' @param join.anchors join answers for anchor items on each test?
 #' @export
 #' @return List of size equal to the number of forms. Each element of the list
 #'   contains a matrix of dichotomic answers (right or wrong) per examinee and
 #'   item.
-genExamAnswers <- function(true.item.parms, true.skills)
+genExamAnswers <- function(true.item.parms, true.skills, join.anchors = FALSE)
 {
   # Detection of external common items
   external.pos <- match("t0", names(true.item.parms))
@@ -56,15 +57,17 @@ genExamAnswers <- function(true.item.parms, true.skills)
   }
 
   # Merge back external anchors
-  if (external)
+  if (join.anchors)
   {
-    ext.names <- grep("t0.", names(test.scores))
-    test.scores.ext <- test.scores[ext.names]
-    test.scores.ext <- Reduce(rbind, test.scores.ext)
-    test.scores <- test.scores[-ext.names]
-    # rownames(test.scores.ext) <- rep(rownames(true.skills), length(test.scores))
-    test.scores[["t0"]] <- test.scores.ext
+    if (external)
+    {
+      ext.names <- grep("t0.", names(test.scores))
+      test.scores.ext <- test.scores[ext.names]
+      test.scores.ext <- Reduce(rbind, test.scores.ext)
+      test.scores <- test.scores[-ext.names]
+      # rownames(test.scores.ext) <- rep(rownames(true.skills), length(test.scores))
+      test.scores[["t0"]] <- test.scores.ext
+    }
   }
-
   return(test.scores)
 }
