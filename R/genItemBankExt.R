@@ -1,7 +1,8 @@
 #' Generate item bank for NEAT with external anchor items
 #'
-#' @param C number of common items between two forms
-#' @param U number of unique items per form
+#' @param C number of common items between two tests
+#' @param U number of unique items per test
+#' @param T number of tests
 #' @param min.a Lower bound for the (uniform) distribution of item
 #'   discrimination parameter
 #' @param max.a Upper bound for the (uniform) distribution of item
