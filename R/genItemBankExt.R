@@ -26,7 +26,7 @@ genItemBankExt <- function(C, U, T, min.a, max.a, mu.b, sd.b) {
   # Create empty aggregated item bank
   true.items           <- matrix(nrow = total.U, ncol = 2 * T + 2)
   true.items.short     <- list()
-  rownames(true.items) <- paste0("i", formatC(1:total.U, flag = "0", width = 3))
+  rownames(true.items) <- paste0("i", 1:total.U)
   colnames(true.items) <- paste0(rep(all.T, each = 2), letters[1:2])
 
   # Generate unique items for all forms except 0 (with anchor/common items)

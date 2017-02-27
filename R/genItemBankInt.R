@@ -22,7 +22,7 @@ genItemBankInt <- function(C, I, T, min.a, max.a, mu.b, sd.b) {
 
   # Create empty aggregated item bank
   true.items           <- matrix(nrow = total.U, ncol = 2 * T)
-  rownames(true.items) <- paste0("i", formatC(1:total.U, flag = "0", width = 3))
+  rownames(true.items) <- paste0("i", 1:total.U)
   colnames(true.items) <- paste0(rep(1:T, each = 2), letters[1:2])
 
   # First form only has unique items
