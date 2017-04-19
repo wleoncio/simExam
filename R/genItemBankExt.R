@@ -45,7 +45,8 @@ genItemBankExt <- function(C, U, T, min.a, max.a, mu.b, sd.b) {
   }
 
   # Common items
-  true.items[(total.U - C + 1):total.U, ] <- c(gen.a(), gen.b())
+  true.items[(total.U - C + 1):total.U, ] <- c(replicate(C, gen.a()),
+                                               replicate(C, gen.b()))
   rows.common <- (total.U - C + 1):total.U
   cols.common <- (total.T * 2 - 1):(total.T * 2)
   true.items.short[[total.T]] <- true.items[rows.common, cols.common]
