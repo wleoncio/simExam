@@ -25,16 +25,13 @@
 #' @export
 
 genTrueItems <- function(C, U, I, T, min.a = .5, max.a = 2, mu.b = 0, sd.b = 1,
-                         anchor.type = "internal", output = "list")
-{
+                         anchor.type = "internal", output = "list") {
   # Generate item bank
-  if (anchor.type == "internal")
-  {
+  if (anchor.type == "internal") {
     if (missing(I)) I <- U + C
     true.items <- genItemBankInt(C, I, T, min.a, max.a, mu.b, sd.b)
   }
-  else
-  {
+  else {
     if (missing(U)) U <- I - C
     true.items <- genItemBankExt(C, U, T, min.a, max.a, mu.b, sd.b)
   }

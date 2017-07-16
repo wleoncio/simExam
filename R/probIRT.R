@@ -1,7 +1,7 @@
 #' Probability of Getting an Item Correct
 #'
-#' @description Calculates the probability of getting an item correct under a 2-parameter IRT
-#' model.
+#' @description Calculates the probability of getting an item correct under a
+#'   2-parameter IRT model.
 #'
 #' @param theta examinee skill
 #' @param a     item discimination
