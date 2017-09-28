@@ -7,7 +7,12 @@
 increaseDevVersion <- function(sep = "-") {
   # Extract
   description <- readLines("DESCRIPTION")
-  str         <- description[4]
+  for (line in 1:length(description)) {
+    if (substr(description[line], 1, 7) == "Version") {
+      str <- description[line]
+      break
+    }
+  }
   cat("Updated from", str)
   regSep      <- paste0("\\", sep)
   str.split   <- strsplit(str, regSep)[[1]]
@@ -19,7 +24,7 @@ increaseDevVersion <- function(sep = "-") {
   # Reassemble
   fixed.str   <- str.split[1:(length(str.split) - 1)]
   str.updated <- paste(c(fixed.str, dev.version.updated), collapse = sep)
-  description[4] <- str.updated
+  description[line] <- str.updated
   cat(" to", str.updated)
 
   # Output
