@@ -10,10 +10,11 @@
 #' @param mu.b Mean of (normally-distributed) item difficulty parameter
 #' @param sd.b Standard deviation of (normally-distributed) item difficulty
 #'   parameter
+#' @param leading0 format item names with leading zeros for better ordering?
 #'
 #' @return list containing 2PL item parameters per form
 #' @export
-genItemBankInt <- function(C, I, T, min.a, max.a, mu.b, sd.b) {
+genItemBankInt <- function(C, I, T, min.a, max.a, mu.b, sd.b, leading0 = TRUE) {
   # Distributions of parameters
   gen.a <- function() runif(n = 1, min = min.a, max = max.a)
   gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
@@ -22,45 +23,40 @@ genItemBankInt <- function(C, I, T, min.a, max.a, mu.b, sd.b) {
 
   # Create empty aggregated item bank
   true.items           <- matrix(nrow = total.U, ncol = 2 * T)
-  rownames(true.items) <- paste0("i", 1:total.U)
+  if (leading0) itemNames <- formatC(1:total.U, width = 2, flag = 0)
+  else itemNames <- 1:total.U
+  rownames(true.items) <- paste0("i", itemNames)
   colnames(true.items) <- paste0(rep(1:T, each = 2), letters[1:2])
 
   # First form only has unique items
-  for (i in 1:I)
-  {
+  for (i in 1:I) {
     true.items[i, "1a"] <- gen.a()
     true.items[i, "1b"] <- gen.b()
     true.items.short    <- list(true.items[1:I, 1:2])  # for future ref.
     names(true.items.short) <- "t1"
   }
-
-  if (T > 1)
-  {
+  if (T > 1) {
     # Forms 2:T are directly linked to one of their previous forms
     unique.i <- I - C
-    for (t in 2:T)
-    {
+    for (t in 2:T) {
       linked.t    <- sample(x = 1:(t - 1), size = 1)
       if (T > 2) cat("Form", t, "is directly linked to form", linked.t, "\n")
       first.unique.i <- (I + 1) + unique.i * (t - 2)
       last.unique.i  <- first.unique.i + unique.i - 1
       a.col <- 2 * t - 1
       b.col <- a.col + 1
-      for (i in first.unique.i:last.unique.i)
-      {
+      for (i in first.unique.i:last.unique.i) {
         # Generates unique items
         true.items[i, a.col] <- gen.a()
         true.items[i, b.col] <- gen.b()
       }
 
       # Takes some items from linked form
-      if (linked.t == 1)
-      {
+      if (linked.t == 1) {
         first.unique.linked <- 1
         last.unique.linked  <- I
       }
-      else
-      {
+      else {
         first.unique.linked <- (I + 1) + unique.i * (linked.t - 2)
         last.unique.linked  <- first.unique.linked + unique.i - 1
       }
