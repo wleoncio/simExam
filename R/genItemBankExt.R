@@ -2,7 +2,7 @@
 #'
 #' @param C number of common items between two tests
 #' @param U number of unique items per test
-#' @param T number of forms
+#' @param t.tot number of forms
 #' @param min.a Lower bound for the (uniform) distribution of item
 #'   discrimination parameter
 #' @param max.a Upper bound for the (uniform) distribution of item
@@ -14,24 +14,24 @@
 #' @importFrom stats runif rnorm
 #' @return list containing 2PL item parameters per form
 #' @export
-genItemBankExt <- function(C, U, T, min.a, max.a, mu.b, sd.b) {
+genItemBankExt <- function(C, U, t.tot, min.a, max.a, mu.b, sd.b) {
   # Distributions of parameters
   gen.a <- function() runif(n = 1, min = min.a, max = max.a)
   gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
 
   # Check if I or U was determined
-  total.U <- (U * T + C)
-  total.T <- T + 1
-  all.T   <- c(1:T, 0)  # form with anchor items = t0
+  total.U <- (U * t.tot + C)
+  total.T <- t.tot + 1
+  all.T   <- c(1:t.tot, 0)  # form with anchor items = t0
 
   # Create empty aggregated item bank
-  true.items           <- matrix(nrow = total.U, ncol = 2 * T + 2)
+  true.items           <- matrix(nrow = total.U, ncol = 2 * t.tot + 2)
   true.items.short     <- list()
   rownames(true.items) <- paste0("i", 1:total.U)
   colnames(true.items) <- paste0(rep(all.T, each = 2), letters[1:2])
 
   # Generate unique items for all forms except 0 (with anchor/common items)
-  for (t in 1:T) {
+  for (t in 1:t.tot) {
     first.u <- (t - 1) * U + 1
     last.u  <- t * U
     a.col   <- 2 * t - 1
@@ -52,7 +52,7 @@ genItemBankExt <- function(C, U, T, min.a, max.a, mu.b, sd.b) {
   names(true.items.short) <- paste0("t", all.T)
   if (length(rows.common) == 1) {  # works around bug for C = 1 (item w/o name)
     true.items.short[["t0"]] <- matrix(true.items.short[["t0"]],
-                                       nrow     = 1,
+                                       nrow = 1,
                                        dimnames = list(rownames(true.items)[nrow(true.items)],
                                                        c("0a", "0b")))
   }

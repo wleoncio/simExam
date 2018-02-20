@@ -33,7 +33,6 @@ genExamAnswers <- function(true.item.parms, true.skills, join.anchors = FALSE) {
   I <- lapply(true.item.parms, nrow)
 
   test.scores <- list()
-  # total.scores <- matrix(nrow = E, ncol = T)
 
   # Creates test results for all tests
   for (t in 1:T) {
@@ -48,7 +47,6 @@ genExamAnswers <- function(true.item.parms, true.skills, join.anchors = FALSE) {
     }
     colnames(test.scores[[t]]) <- rownames(true.item.parms[[t]])
     rownames(test.scores[[t]]) <- rownames(true.skills)
-    # total.scores[, t] <- rowSums(test.scores[[t]])
   }
 
   # Merge back external anchors
@@ -58,7 +56,6 @@ genExamAnswers <- function(true.item.parms, true.skills, join.anchors = FALSE) {
       test.scores.ext <- test.scores[ext.names]
       test.scores.ext <- Reduce(rbind, test.scores.ext)
       test.scores <- test.scores[-ext.names]
-      # rownames(test.scores.ext) <- rep(rownames(true.skills), length(test.scores))
       test.scores[["t0"]] <- test.scores.ext
     }
   }

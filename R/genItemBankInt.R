@@ -2,7 +2,7 @@
 #'
 #' @param C number of common items between two test
 #' @param I number of total items (unique + common) per test
-#' @param T number of tests
+#' @param t.tot number of tests
 #' @param min.a Lower bound for the (uniform) distribution of item
 #'   discrimination parameter
 #' @param max.a Upper bound for the (uniform) distribution of item
@@ -15,19 +15,20 @@
 #' @importFrom stats runif rnorm complete.cases
 #' @return list containing 2PL item parameters per form
 #' @export
-genItemBankInt <- function(C, I, T, min.a, max.a, mu.b, sd.b, leading0 = TRUE) {
+genItemBankInt <- function(C, I, t.tot, min.a, max.a, mu.b, sd.b,
+                           leading0 = TRUE) {
   # Distributions of parameters
   gen.a <- function() runif(n = 1, min = min.a, max = max.a)
   gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
 
-  total.U <- I * T - (C * (T - 1))
+  total.U <- I * t.tot - (C * (t.tot - 1))
 
   # Create empty aggregated item bank
-  true.items           <- matrix(nrow = total.U, ncol = 2 * T)
+  true.items           <- matrix(nrow = total.U, ncol = 2 * t.tot)
   if (leading0) itemNames <- formatC(1:total.U, width = 2, flag = 0)
   else itemNames <- 1:total.U
   rownames(true.items) <- paste0("i", itemNames)
-  colnames(true.items) <- paste0(rep(1:T, each = 2), letters[1:2])
+  colnames(true.items) <- paste0(rep(1:t.tot, each = 2), letters[1:2])
 
   # First form only has unique items
   for (i in 1:I) {
@@ -36,12 +37,12 @@ genItemBankInt <- function(C, I, T, min.a, max.a, mu.b, sd.b, leading0 = TRUE) {
     true.items.short    <- list(true.items[1:I, 1:2])  # for future ref.
     names(true.items.short) <- "t1"
   }
-  if (T > 1) {
-    # Forms 2:T are directly linked to one of their previous forms
+  if (t.tot > 1) {
+    # Forms 2:t.tot are directly linked to one of their previous forms
     unique.i <- I - C
-    for (t in 2:T) {
+    for (t in 2:t.tot) {
       linked.t    <- sample(x = 1:(t - 1), size = 1)
-      if (T > 2) cat("Form", t, "is directly linked to form", linked.t, "\n")
+      if (t.tot > 2) cat("Form", t, "is directly linked to form", linked.t, "\n")
       first.unique.i <- (I + 1) + unique.i * (t - 2)
       last.unique.i  <- first.unique.i + unique.i - 1
       a.col <- 2 * t - 1
@@ -70,7 +71,7 @@ genItemBankInt <- function(C, I, T, min.a, max.a, mu.b, sd.b, leading0 = TRUE) {
       present.items <- complete.cases(true.items.short[[t]])
       true.items.short[[t]] <- true.items.short[[t]][present.items, ]
     }
-    names(true.items.short) <- paste0("t", 1:T)
+    names(true.items.short) <- paste0("t", 1:t.tot)
   }
   output <- list("matrix" = true.items, "list" = true.items.short)
   return(output)
