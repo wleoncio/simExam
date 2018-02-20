@@ -2,7 +2,7 @@
 #'
 #' @param C number of common items between two tests
 #' @param U number of unique items per test
-#' @param T number of tests
+#' @param T number of forms
 #' @param min.a Lower bound for the (uniform) distribution of item
 #'   discrimination parameter
 #' @param max.a Upper bound for the (uniform) distribution of item
@@ -11,6 +11,7 @@
 #' @param sd.b Standard deviation of (normally-distributed) item difficulty
 #'   parameter
 #'
+#' @importFrom stats runif rnorm
 #' @return list containing 2PL item parameters per form
 #' @export
 genItemBankExt <- function(C, U, T, min.a, max.a, mu.b, sd.b) {

@@ -6,6 +6,7 @@
 #' @param true.item.parms true item parameters per form
 #' @param true.skills     true examinee skill per form
 #' @param join.anchors join answers for anchor items on each test?
+#' @importFrom stats rbinom
 #' @export
 #' @return List of size equal to the number of forms. Each element of the list
 #'   contains a matrix of dichotomic answers (right or wrong) per examinee and

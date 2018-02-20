@@ -12,6 +12,7 @@
 #'   parameter
 #' @param leading0 format item names with leading zeros for better ordering?
 #'
+#' @importFrom stats runif rnorm complete.cases
 #' @return list containing 2PL item parameters per form
 #' @export
 genItemBankInt <- function(C, I, T, min.a, max.a, mu.b, sd.b, leading0 = TRUE) {
