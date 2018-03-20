@@ -17,11 +17,14 @@
 #' @export
 genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
                            leading0 = TRUE) {
+  if (C >= J) stop("C must be larger than J")
+  if (C >= J / 2) message("For J = ", J, ", C should be at most ")
   # Distributions of parameters
   gen.a <- function() runif(n = 1, min = min.a, max = max.a)
   gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
 
   total.U <- J * t.tot - (C * (t.tot - 1))
+
 
   # Create empty aggregated item bank
   true.items           <- matrix(nrow = total.U, ncol = 2 * t.tot)
@@ -64,10 +67,8 @@ genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
       }
       items.linked <- true.items[first.unique.linked:last.unique.linked, ]
       if (nrow(items.linked) < C) {
-        message("The number of common items (", C, ") is too large. Form ",
-                linked.t, " only has ", nrow(items.linked), " unique items.",
-                " Try setting C = ", nrow(items.linked), ".")
-        stop()
+        stop("The number of common items (", C, ") is too large. Try C = ",
+             floor(J / 2), " or smaller.")
       }
       common.i <- sort(sample(rownames(items.linked), C))
       true.items[common.i, a.col] <- true.items[common.i, paste0(linked.t, "a")]
