@@ -16,6 +16,7 @@ genExamAnswers <- function(true.item.parms, true.skills, join.anchors = FALSE) {
   external.pos <- match("t0", names(true.item.parms))
   external     <- !is.na(external.pos)
   if (external) {
+    # TODO: breaks now that true.skills is a list!
     not.ext.names <- names(true.item.parms)[-external.pos]
     true.skills  <- cbind(true.skills, true.skills)
     ext.names <- paste0("t0.", 1:(length(true.item.parms) - 1))
@@ -28,25 +29,25 @@ genExamAnswers <- function(true.item.parms, true.skills, join.anchors = FALSE) {
   }
 
   # Generation of results for all administrations
-  E <- nrow(true.skills)
+  I <- sapply(true.skills, length)
   T <- length(true.item.parms)
-  I <- lapply(true.item.parms, nrow)
+  J <- sapply(true.item.parms, nrow)
 
   test.scores <- list()
 
   # Creates test results for all tests
   for (t in 1:T) {
-    test.scores[[names(I[t])]] <- matrix(nrow = E, ncol = I[[t]])
-    for (e in 1:E) {
-      for (i in 1:I[[t]]) {
-        p <- probIRT(theta = true.skills[e, t],
-                     a     = true.item.parms[[t]][i, 1],
-                     b     = true.item.parms[[t]][i, 2])
-        test.scores[[names(I[t])]][e, i] <- rbinom(n = 1, size = 1, prob = p)
+    test.scores[[names(J[t])]] <- matrix(nrow = I[t], ncol = J[t])
+    for (i in seq_len(I[t])) {
+      for (j in seq_len(J[t])) {
+        p <- probIRT(theta = true.skills[[t]][i],
+                     a     = true.item.parms[[t]][j, 1],
+                     b     = true.item.parms[[t]][j, 2])
+        test.scores[[names(J[t])]][i, j] <- rbinom(n = 1, size = 1, prob = p)
       }
     }
     colnames(test.scores[[t]]) <- rownames(true.item.parms[[t]])
-    rownames(test.scores[[t]]) <- rownames(true.skills)
+    rownames(test.scores[[t]]) <- names(true.skills[[t]])
   }
 
   # Merge back external anchors
