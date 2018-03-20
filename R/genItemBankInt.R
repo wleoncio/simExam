@@ -17,8 +17,11 @@
 #' @export
 genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
                            leading0 = TRUE) {
-  if (C >= J) stop("C must be larger than J")
-  if (C >= J / 2) message("For J = ", J, ", C should be at most ")
+  if (C >= J) stop("C must be smaller than J")
+  if (C >= (J / 2)) message("For J = ", J, ", C should be at most ",
+                            floor(J / 2), ", otherwise the linkage plan may ",
+                            "be impossible. \nIn case of errors, try a",
+                            " smaller value for C.")
   # Distributions of parameters
   gen.a <- function() runif(n = 1, min = min.a, max = max.a)
   gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
@@ -66,10 +69,6 @@ genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
         last.unique.linked  <- first.unique.linked + unique.i - 1
       }
       items.linked <- true.items[first.unique.linked:last.unique.linked, ]
-      if (nrow(items.linked) < C) {
-        stop("The number of common items (", C, ") is too large. Try C = ",
-             floor(J / 2), " or smaller.")
-      }
       common.i <- sort(sample(rownames(items.linked), C))
       true.items[common.i, a.col] <- true.items[common.i, paste0(linked.t, "a")]
       true.items[common.i, b.col] <- true.items[common.i, paste0(linked.t, "b")]
