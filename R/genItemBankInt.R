@@ -33,7 +33,7 @@ genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
   true.items           <- matrix(nrow = total.U, ncol = 2 * t.tot)
   if (leading0) itemNames <- formatC(1:total.U, width = 2, flag = 0)
   else itemNames <- 1:total.U
-  rownames(true.items) <- paste0("i", itemNames)
+  rownames(true.items) <- paste0("j", itemNames)
   colnames(true.items) <- paste0(rep(1:t.tot, each = 2), letters[1:2])
 
   # First form only has unique items
