@@ -6,7 +6,7 @@
 #'   al. 2004).
 #'
 #' @param C number of common items between two forms
-#' @param I number of items per form
+#' @param J number of items per form
 #' @param U number of unique items per form (only valid for external anchor)
 #' @param num.forms number of forms
 #' @param min.a Lower bound for the (uniform) distribution of item
@@ -24,16 +24,16 @@
 #' @author Waldir Leoncio
 #' @export
 
-genTrueItems <- function(C, U, I, num.forms, min.a = .5, max.a = 2,
+genTrueItems <- function(C, U, J, num.forms, min.a = .5, max.a = 2,
                          mu.b = 0, sd.b = 1,
                          anchor.type = "internal", output = "list") {
   # Generate item bank
   if (anchor.type == "internal") {
-    if (missing(I)) I <- U + C
-    true.items <- genItemBankInt(C, I, num.forms, min.a, max.a, mu.b, sd.b)
+    if (missing(J)) J <- U + C
+    true.items <- genItemBankInt(C, J, num.forms, min.a, max.a, mu.b, sd.b)
   }
   else {
-    if (missing(U)) U <- I - C
+    if (missing(U)) U <- J - C
     true.items <- genItemBankExt(C, U, num.forms, min.a, max.a, mu.b, sd.b)
   }
   return(true.items[[output]])
