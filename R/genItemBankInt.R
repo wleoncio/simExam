@@ -1,7 +1,7 @@
 #' Generate item bank for NEAT with internal anchor items
 #'
 #' @param C number of common items between two test
-#' @param I number of total items (unique + common) per test
+#' @param J number of total items (unique + common) per test
 #' @param t.tot number of tests
 #' @param min.a Lower bound for the (uniform) distribution of item
 #'   discrimination parameter
@@ -15,13 +15,13 @@
 #' @importFrom stats runif rnorm complete.cases
 #' @return list containing 2PL item parameters per form
 #' @export
-genItemBankInt <- function(C, I, t.tot, min.a, max.a, mu.b, sd.b,
+genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
                            leading0 = TRUE) {
   # Distributions of parameters
   gen.a <- function() runif(n = 1, min = min.a, max = max.a)
   gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
 
-  total.U <- I * t.tot - (C * (t.tot - 1))
+  total.U <- J * t.tot - (C * (t.tot - 1))
 
   # Create empty aggregated item bank
   true.items           <- matrix(nrow = total.U, ncol = 2 * t.tot)
@@ -31,24 +31,24 @@ genItemBankInt <- function(C, I, t.tot, min.a, max.a, mu.b, sd.b,
   colnames(true.items) <- paste0(rep(1:t.tot, each = 2), letters[1:2])
 
   # First form only has unique items
-  for (i in 1:I) {
+  for (i in 1:J) {
     true.items[i, "1a"] <- gen.a()
     true.items[i, "1b"] <- gen.b()
-    true.items.short    <- list(true.items[1:I, 1:2])  # for future ref.
+    true.items.short    <- list(true.items[1:J, 1:2])  # for future ref.
     names(true.items.short) <- "t1"
   }
   if (t.tot > 1) {
     # Forms 2:t.tot are directly linked to one of their previous forms
-    unique.i <- I - C
+    unique.i <- J - C
     for (t in 2:t.tot) {
-      linked.t    <- sample(x = 1:(t - 1), size = 1)
+      linked.t    <- sample(x = 1:(t - 1), size = 1)  # Choose linked form
       if (t.tot > 2) cat("Form", t, "is directly linked to form", linked.t, "\n")
-      first.unique.i <- (I + 1) + unique.i * (t - 2)
+      first.unique.i <- (J + 1) + unique.i * (t - 2)
       last.unique.i  <- first.unique.i + unique.i - 1
       a.col <- 2 * t - 1
       b.col <- a.col + 1
       for (i in first.unique.i:last.unique.i) {
-        # Generates unique items
+        # Generates item parameters for unique items
         true.items[i, a.col] <- gen.a()
         true.items[i, b.col] <- gen.b()
       }
@@ -56,13 +56,19 @@ genItemBankInt <- function(C, I, t.tot, min.a, max.a, mu.b, sd.b,
       # Takes some items from linked form
       if (linked.t == 1) {
         first.unique.linked <- 1
-        last.unique.linked  <- I
+        last.unique.linked  <- J
       }
       else {
-        first.unique.linked <- (I + 1) + unique.i * (linked.t - 2)
+        first.unique.linked <- (J + 1) + unique.i * (linked.t - 2)
         last.unique.linked  <- first.unique.linked + unique.i - 1
       }
       items.linked <- true.items[first.unique.linked:last.unique.linked, ]
+      if (nrow(items.linked) < C) {
+        message("The number of common items (", C, ") is too large. Form ",
+                linked.t, " only has ", nrow(items.linked), " unique items.",
+                " Try setting C = ", nrow(items.linked), ".")
+        stop()
+      }
       common.i <- sort(sample(rownames(items.linked), C))
       true.items[common.i, a.col] <- true.items[common.i, paste0(linked.t, "a")]
       true.items[common.i, b.col] <- true.items[common.i, paste0(linked.t, "b")]
