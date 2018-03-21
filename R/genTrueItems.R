@@ -24,7 +24,7 @@
 #' @author Waldir Leoncio
 #' @export
 
-genTrueItems <- function(C, U, J, num.forms, min.a = .5, max.a = 2,
+genTrueItems <- function(C, J, U, num.forms, min.a = .5, max.a = 2,
                          mu.b = 0, sd.b = 1,
                          anchor.type = "internal", output = "list") {
   # Generate item bank
