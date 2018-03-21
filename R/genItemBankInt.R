@@ -17,8 +17,8 @@
 #' @export
 genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
                            leading0 = TRUE) {
-  if (C >= J) stop("C must be smaller than J")
-  if (C >= (J / 2)) message("For J = ", J, ", C should be at most ",
+  if (C > J) stop("C must be smaller than J")
+  if (C > (J / 2)) message("For J = ", J, ", C should be at most ",
                             floor(J / 2), ", otherwise the linkage plan may ",
                             "be impossible. \nIn case of errors, try a",
                             " smaller value for C.")
