@@ -16,7 +16,7 @@
 genTrueSkills <- function(I, num.forms, mu.skill = rep(0, num.forms),
                           sd.skill = rep(1, num.forms)) {
   true.skills <- list()
-  I <- rep(I, num.forms)
+  if (length(I) == 1) I <- rep(I, num.forms)
   for (t in 1:num.forms) {
     true.skills[[t]] <- rnorm(n = I[t], mean = mu.skill[t], sd = sd.skill[t])
     names(true.skills[[t]]) <- paste0("i", 1:I[t])
