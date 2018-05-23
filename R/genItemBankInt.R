@@ -11,12 +11,12 @@
 #' @param sd.b Standard deviation of (normally-distributed) item difficulty
 #'   parameter
 #' @param leading0 format item names with leading zeros for better ordering?
-#'
+#' @param num.digits number of digits for representing items
 #' @importFrom stats runif rnorm complete.cases
 #' @return list containing 2PL item parameters per form
 #' @export
 genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
-                           leading0 = TRUE) {
+                           leading0 = TRUE, num.digits = 3) {
   if (C > J) stop("C must be smaller than J")
   if (C > (J / 2)) message("For J = ", J, ", C should be at most ",
                             floor(J / 2), ", otherwise the linkage plan may ",
@@ -31,7 +31,7 @@ genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
 
   # Create empty aggregated item bank
   true.items           <- matrix(nrow = total.U, ncol = 2 * t.tot)
-  if (leading0) itemNames <- formatC(1:total.U, width = 2, flag = 0)
+  if (leading0) itemNames <- formatC(1:total.U, width = num.digits, flag = 0)
   else itemNames <- 1:total.U
   rownames(true.items) <- paste0("j", itemNames)
   colnames(true.items) <- paste0(rep(1:t.tot, each = 2), letters[1:2])
