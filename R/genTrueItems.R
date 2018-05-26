@@ -19,22 +19,23 @@
 #' @param anchor.type type of anchor item set ("internal" or "external")
 #' @param output type of output; "list" gives a list of used items per form,
 #'   "matrix" gives a joint matrix (data.frame).
-#'
+#' @param ... extra parameters to be passed to genItemBankInt() or
+#'   genItemBankExt()
 #' @return List of true item parameters per form
 #' @author Waldir Leoncio
 #' @export
 
 genTrueItems <- function(C, J, U, num.forms, min.a = .5, max.a = 2,
                          mu.b = 0, sd.b = 1,
-                         anchor.type = "internal", output = "list") {
+                         anchor.type = "internal", output = "list", ...) {
   # Generate item bank
   if (anchor.type == "internal") {
     if (missing(J)) J <- U + C
-    true.items <- genItemBankInt(C, J, num.forms, min.a, max.a, mu.b, sd.b)
+    true.items <- genItemBankInt(C, J, num.forms, min.a, max.a, mu.b, sd.b, ...)
   }
   else {
     if (missing(U)) U <- J - C
-    true.items <- genItemBankExt(C, U, num.forms, min.a, max.a, mu.b, sd.b)
+    true.items <- genItemBankExt(C, U, num.forms, min.a, max.a, mu.b, sd.b, ...)
   }
   return(true.items[[output]])
 }

@@ -12,20 +12,20 @@
 #'   parameter
 #' @param leading0 format item names with leading zeros for better ordering?
 #' @param num.digits number of digits for representing items
+#' @param linkage.plan square matrix or order t.tot representing the number of
+#'   items each form has in common with another form. If NULL, links between
+#'   forms will be chosen randomly.
 #' @importFrom stats runif rnorm complete.cases
 #' @return list containing 2PL item parameters per form
 #' @export
 genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
-                           leading0 = TRUE, num.digits = 3) {
+                           leading0 = TRUE, num.digits = 3,
+                           linkage.plan = NULL) {
   if (C > J) stop("C must be smaller than J")
   if (C > (J / 2)) message("For J = ", J, ", C should be at most ",
                             floor(J / 2), ", otherwise the linkage plan may ",
                             "be impossible. \nIn case of errors, try a",
                             " smaller value for C.")
-  # Distributions of parameters
-  gen.a <- function() runif(n = 1, min = min.a, max = max.a)
-  gen.b <- function() rnorm(n = 1, mean = mu.b, sd = sd.b)
-
   total.U <- J * t.tot - (C * (t.tot - 1))
 
 
@@ -36,49 +36,13 @@ genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
   rownames(true.items) <- paste0("j", itemNames)
   colnames(true.items) <- paste0(rep(1:t.tot, each = 2), letters[1:2])
 
-  # First form only has unique items
-  for (i in 1:J) {
-    true.items[i, "1a"] <- gen.a()
-    true.items[i, "1b"] <- gen.b()
-    true.items.short    <- list(true.items[1:J, 1:2])  # for future ref.
-    names(true.items.short) <- "t1"
-  }
-  if (t.tot > 1) {
-    # Forms 2:t.tot are directly linked to one of their previous forms
-    unique.i <- J - C
-    for (t in 2:t.tot) {
-      linked.t    <- sample(x = 1:(t - 1), size = 1)  # Choose linked form
-      if (t.tot > 2) cat("Form", t, "is directly linked to form", linked.t, "\n")
-      first.unique.i <- (J + 1) + unique.i * (t - 2)
-      last.unique.i  <- first.unique.i + unique.i - 1
-      a.col <- 2 * t - 1
-      b.col <- a.col + 1
-      for (i in first.unique.i:last.unique.i) {
-        # Generates item parameters for unique items
-        true.items[i, a.col] <- gen.a()
-        true.items[i, b.col] <- gen.b()
-      }
+  # Expand linkage plan
+  if (is.null(linkage.plan)) {
+    items <- fillRandomLinkagePlan(t.tot, J, C, true.items, min.a, max.a,
+                                   mu.b, sd.b)
+  } else {
 
-      # Takes some items from linked form
-      if (linked.t == 1) {
-        first.unique.linked <- 1
-        last.unique.linked  <- J
-      }
-      else {
-        first.unique.linked <- (J + 1) + unique.i * (linked.t - 2)
-        last.unique.linked  <- first.unique.linked + unique.i - 1
-      }
-      items.linked <- true.items[first.unique.linked:last.unique.linked, ]
-      common.i <- sort(sample(rownames(items.linked), C))
-      true.items[common.i, a.col] <- true.items[common.i, paste0(linked.t, "a")]
-      true.items[common.i, b.col] <- true.items[common.i, paste0(linked.t, "b")]
-
-      true.items.short[[t]] <- true.items[, a.col:b.col]
-      present.items <- complete.cases(true.items.short[[t]])
-      true.items.short[[t]] <- true.items.short[[t]][present.items, ]
-    }
-    names(true.items.short) <- paste0("t", 1:t.tot)
   }
-  output <- list("matrix" = true.items, "list" = true.items.short)
+  output <- list("matrix" = items$matrix, "list" = items$list)
   return(output)
 }
