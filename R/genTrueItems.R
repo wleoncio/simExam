@@ -19,6 +19,7 @@
 #' @param anchor.type type of anchor item set ("internal" or "external")
 #' @param output type of output; "list" gives a list of used items per form,
 #'   "matrix" gives a joint matrix (data.frame).
+#' @param linkage.plan matrix containing linkage plan
 #' @param ... extra parameters to be passed to genItemBankInt() or
 #'   genItemBankExt()
 #' @return List of true item parameters per form

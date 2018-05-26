@@ -16,6 +16,7 @@
 #'   items each form has in common with another form. If NULL, links between
 #'   forms will be chosen randomly.
 #' @importFrom stats runif rnorm complete.cases
+#' @importFrom Matrix tril
 #' @return list containing 2PL item parameters per form
 #' @export
 genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,

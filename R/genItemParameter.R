@@ -5,7 +5,7 @@
 #' @param parms vector of length two. If type = "a", parms must be setup such
 #'   that \eqn{a ~ U(parms[1], parms[2])}. For type = "b", parms must be such
 #'   that \eqn{b ~ N(parms[1], parms[2])}.
-#' @qty number of item parameters to generate
+#' @param quantity number of item parameters to generate
 #'
 #' @return scalar containing one item parameter
 #' @export
