@@ -51,7 +51,7 @@ genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
     items <- fillRandomLinkagePlan(t.tot, J, C, true.items, min.a, max.a,
                                    mu.b, sd.b)
   } else {
-    items <- fillCustomLinkagePlan(t.tot, J, C, true.items, linkage.plan,
+    items <- fillCustomLinkagePlan(t.tot, true.items, linkage.plan,
                                    min.a, max.a, mu.b, sd.b)
   }
   output <- list("matrix" = items$matrix, "list" = items$list)
