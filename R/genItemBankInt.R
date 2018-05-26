@@ -21,18 +21,28 @@
 genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
                            leading0 = TRUE, num.digits = 3,
                            linkage.plan = NULL) {
-  if (C > J) stop("C must be smaller than J")
-  if (C > (J / 2)) message("For J = ", J, ", C should be at most ",
-                            floor(J / 2), ", otherwise the linkage plan may ",
-                            "be impossible. \nIn case of errors, try a",
-                            " smaller value for C.")
-  total.U <- J * t.tot - (C * (t.tot - 1))
+  if (missing(C)) C <- NA
+  if (missing(J)) J <- NA
+  if (!is.null(linkage.plan)) {
+    total.U <- sum(Matrix::tril(linkage.plan))
+  } else {
+    if (C > J) stop("C must be smaller than J")
+    if (C > (J / 2)) message("For J = ", J, ", C should be at most ",
+                             floor(J / 2), ", otherwise the linkage plan may ",
+                             "be impossible. \nIn case of errors, try a",
+                             " smaller value for C.")
+    total.U <- J * t.tot - (C * (t.tot - 1))
+
+  }
 
 
   # Create empty aggregated item bank
-  true.items           <- matrix(nrow = total.U, ncol = 2 * t.tot)
-  if (leading0) itemNames <- formatC(1:total.U, width = num.digits, flag = 0)
-  else itemNames <- 1:total.U
+  true.items <- matrix(nrow = total.U, ncol = 2 * t.tot)
+  if (leading0) {
+    itemNames <- formatC(1:total.U, width = num.digits, flag = 0)
+  } else {
+    itemNames <- 1:total.U
+  }
   rownames(true.items) <- paste0("j", itemNames)
   colnames(true.items) <- paste0(rep(1:t.tot, each = 2), letters[1:2])
 
@@ -41,7 +51,8 @@ genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
     items <- fillRandomLinkagePlan(t.tot, J, C, true.items, min.a, max.a,
                                    mu.b, sd.b)
   } else {
-
+    items <- fillCustomLinkagePlan(t.tot, J, C, true.items, linkage.plan,
+                                   min.a, max.a, mu.b, sd.b)
   }
   output <- list("matrix" = items$matrix, "list" = items$list)
   return(output)

@@ -27,13 +27,19 @@
 
 genTrueItems <- function(C, J, U, num.forms, min.a = .5, max.a = 2,
                          mu.b = 0, sd.b = 1,
-                         anchor.type = "internal", output = "list", ...) {
+                         anchor.type = "internal", output = "list",
+                         linkage.plan = NULL, ...) {
   # Generate item bank
   if (anchor.type == "internal") {
-    if (missing(J)) J <- U + C
-    true.items <- genItemBankInt(C, J, num.forms, min.a, max.a, mu.b, sd.b, ...)
-  }
-  else {
+    if (is.null(linkage.plan)) {
+      if (missing(J)) J <- U + C
+      true.items <- genItemBankInt(C, J, num.forms, min.a, max.a, mu.b, sd.b, ...)
+    } else {
+      true.items <- genItemBankInt(t.tot = num.forms, min.a = min.a,
+                                   max.a = max.a, mu.b = mu.b, sd.b = sd.b,
+                                   linkage.plan = linkage.plan, ...)
+    }
+  } else {
     if (missing(U)) U <- J - C
     true.items <- genItemBankExt(C, U, num.forms, min.a, max.a, mu.b, sd.b, ...)
   }
