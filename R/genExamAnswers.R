@@ -6,7 +6,7 @@
 #' @param true.item.parms true item parameters per form
 #' @param true.skills     true examinee skill per form
 #' @param join.anchors join answers for anchor items on each test?
-#' @importFrom stats rbinom
+#' @importFrom stats rbinom var
 #' @export
 #' @return List of size equal to the number of forms. Each element of the list
 #'   contains a matrix of dichotomic answers (right or wrong) per examinee and
@@ -40,18 +40,16 @@ genExamAnswers <- function(true.item.parms, true.skills, join.anchors = FALSE) {
                 function(x) probIRT(theta = x,
                                     a     = true.item.parms[[t]][, 1],
                                     b     = true.item.parms[[t]][, 2]))
-    test.scores[[t]] <- t(sapply(seq(I[[t]]),
-                                 function(x) rbinom(n = J[[t]], 1,
-                                                    prob = p[, x])))
-    one.ans <- apply(test.scores[[t]], 2, var) == 0
+    test.scores[[t]] <-
+      t(sapply(seq(I[[t]]), function(x) rbinom(n = J[[t]], 1, prob = p[, x])))
+    one.ans <- apply(test.scores[[t]], 2, stats::var) == 0
     while (any(one.ans)) {
       cat("Form ", t, " has unanimous scores for items ", which(one.ans),
           ". Retesting.\n", sep = "")
-      test.scores[[t]][, one.ans] <- t(sapply(seq(I[[t]]),
-                                              function(x) rbinom(n = sum(one.ans),
-                                                                 1,
-                                                                 prob = p[one.ans, x])))
-      one.ans <- apply(test.scores[[t]], 2, var) == 0
+      test.scores[[t]][, one.ans] <-
+        t(sapply(seq(I[[t]]), function(x) rbinom(n = sum(one.ans), 1,
+                                                 prob = p[one.ans, x])))
+      one.ans <- apply(test.scores[[t]], 2, stats::var) == 0
     }
     colnames(test.scores[[t]]) <- rownames(true.item.parms[[t]])
     rownames(test.scores[[t]]) <- names(true.skills[[t]])

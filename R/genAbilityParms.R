@@ -9,7 +9,6 @@
 #' @return List containing means and standard deviations per form
 #' @export
 #'
-#' @examples
 genAbilityParms <- function(forms.n, mu.first, sd.first,
                             mu.last = mu.first, sd.last = sd.first) {
   list(mu = seq(mu.first, mu.last, length = forms.n),
