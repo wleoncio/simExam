@@ -35,20 +35,18 @@ genExamAnswers <- function(true.item.parms, true.skills, join.anchors = FALSE) {
 
   test.scores <- list()
 
-  # Creates test results for all tests
   for (t in 1:T) {
-    test.scores[[names(J[t])]] <- matrix(nrow = I[t], ncol = J[t])
-    for (i in seq_len(I[t])) {
-      for (j in seq_len(J[t])) {
-        p <- probIRT(theta = true.skills[[t]][i],
-                     a     = true.item.parms[[t]][j, 1],
-                     b     = true.item.parms[[t]][j, 2])
-        test.scores[[names(J[t])]][i, j] <- rbinom(n = 1, size = 1, prob = p)
-      }
-    }
+    p <- sapply(true.skills[[t]],
+                function(x) probIRT(theta = x,
+                                    a     = true.item.parms[[t]][, 1],
+                                    b     = true.item.parms$t1[, 2]))
+    test.scores[[t]] <- t(sapply(seq(I[[1]]),
+                                 function(x) rbinom(n = J[[1]], 1,
+                                                    prob = p[, x])))
     colnames(test.scores[[t]]) <- rownames(true.item.parms[[t]])
     rownames(test.scores[[t]]) <- names(true.skills[[t]])
   }
+  names(test.scores) <- names(true.skills)
 
   # Merge back external anchors
   if (join.anchors) {
