@@ -39,10 +39,20 @@ genExamAnswers <- function(true.item.parms, true.skills, join.anchors = FALSE) {
     p <- sapply(true.skills[[t]],
                 function(x) probIRT(theta = x,
                                     a     = true.item.parms[[t]][, 1],
-                                    b     = true.item.parms$t1[, 2]))
-    test.scores[[t]] <- t(sapply(seq(I[[1]]),
-                                 function(x) rbinom(n = J[[1]], 1,
+                                    b     = true.item.parms[[t]][, 2]))
+    test.scores[[t]] <- t(sapply(seq(I[[t]]),
+                                 function(x) rbinom(n = J[[t]], 1,
                                                     prob = p[, x])))
+    one.ans <- apply(test.scores[[t]], 2, var) == 0
+    while (any(one.ans)) {
+      cat("Form ", t, " has unanimous scores for items ", which(one.ans),
+          ". Retesting.\n", sep = "")
+      test.scores[[t]][, one.ans] <- t(sapply(seq(I[[t]]),
+                                              function(x) rbinom(n = sum(one.ans),
+                                                                 1,
+                                                                 prob = p[one.ans, x])))
+      one.ans <- apply(test.scores[[t]], 2, var) == 0
+    }
     colnames(test.scores[[t]]) <- rownames(true.item.parms[[t]])
     rownames(test.scores[[t]]) <- names(true.skills[[t]])
   }
