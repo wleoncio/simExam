@@ -6,7 +6,7 @@
 #'   that \eqn{a ~ U(parms[1], parms[2])}. For type = "b", parms must be such
 #'   that \eqn{b ~ N(parms[1], parms[2])}.
 #' @param quantity number of item parameters to generate
-#'
+#' @importFrom msm rtnorm
 #' @return scalar containing one item parameter
 #' @export
 #'
@@ -14,7 +14,16 @@ genItemParameter <- function(type, parms, quantity = 1) {
   if (type == "a") {
     item.parameter <- runif(n = quantity, min = parms[1], max = parms[2])
   } else if (type == "b") {
-      item.parameter <- rnorm(n = quantity, mean = parms[1], sd = parms[2])
+    if (length(parms) == 2) {
+      # Sets truncation limits for b
+      parms[3] <- -2
+      parms[4] <- 2
+    }
+    item.parameter <- msm::rtnorm(n     = quantity,
+                                  mean  = parms[1],
+                                  sd    = parms[2],
+                                  lower = parms[3],
+                                  upper = parms[4])
   }
   return(item.parameter)
 }

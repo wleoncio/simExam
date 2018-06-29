@@ -39,7 +39,7 @@ fillRandomLinkagePlan <- function(t.tot, J, C, true.items, min.a, max.a, mu.b,
       for (i in first.unique.i:last.unique.i) {
         # Generates item parameters for unique items
         true.items[i, a.col] <- genItemParameter("a", c(min.a, max.a))
-        true.items[i, b.col] <- genItemParameter("a", c(mu.b, sd.b))
+        true.items[i, b.col] <- genItemParameter("b", c(mu.b, sd.b))
       }
 
       # Takes some items from linked form
