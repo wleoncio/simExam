@@ -20,7 +20,7 @@
 #' @return list containing 2PL item parameters per form
 #' @export
 genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
-                           leading0 = TRUE, num.digits = 3,
+                           leading0 = TRUE, num.digits = 4,
                            linkage.plan = NULL) {
   if (missing(C)) C <- NA
   if (missing(J)) J <- NA
