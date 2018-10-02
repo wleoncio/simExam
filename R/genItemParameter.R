@@ -6,24 +6,24 @@
 #'   that \eqn{a ~ U(parms[1], parms[2])}. For type = "b", parms must be such
 #'   that \eqn{b ~ N(parms[1], parms[2])}.
 #' @param quantity number of item parameters to generate
+#' @param truncate.b vector of length 2 containing the limits for the difficulty
+#'   distribution
 #' @importFrom msm rtnorm
 #' @return scalar containing one item parameter
 #' @export
 #'
-genItemParameter <- function(type, parms, quantity = 1) {
+genItemParameter <- function(type, parms, quantity = 1,
+                             truncate.b = c(-Inf, Inf)) {
   if (type == "a") {
     item.parameter <- runif(n = quantity, min = parms[1], max = parms[2])
   } else if (type == "b") {
-    if (length(parms) == 2) {
-      # Sets truncation limits for b
-      parms[3] <- -2
-      parms[4] <- 2
-    }
     item.parameter <- msm::rtnorm(n     = quantity,
                                   mean  = parms[1],
                                   sd    = parms[2],
-                                  lower = parms[3],
-                                  upper = parms[4])
+                                  lower = truncate[1],
+                                  upper = truncate[2])
+  } else {
+    stop("type must be 'a' or 'b'.")
   }
   return(item.parameter)
 }

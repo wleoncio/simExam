@@ -12,15 +12,15 @@
 #' @param mu.b Mean of (normally-distributed) item difficulty parameter
 #' @param sd.b Standard deviation of (normally-distributed) item difficulty
 #'   parameter
-#'
+#' @param ... Arguments to pass to genItemParameter
 #' @export
 fillRandomLinkagePlan <- function(t.tot, J, C, true.items, min.a, max.a, mu.b,
-                                    sd.b) {
+                                    sd.b, ...) {
   true.items.short <- list()
   # First form only has unique items
   for (i in 1:J) {
-    true.items[i, "1a"] <- genItemParameter("a", c(min.a, max.a))
-    true.items[i, "1b"] <- genItemParameter("b", c(mu.b, sd.b))
+    true.items[i, "1a"] <- genItemParameter("a", c(min.a, max.a), ...)
+    true.items[i, "1b"] <- genItemParameter("b", c(mu.b, sd.b), ...)
     true.items.short    <- list(true.items[1:J, 1:2])  # for future ref.
     names(true.items.short) <- "t1"
   }
@@ -38,8 +38,8 @@ fillRandomLinkagePlan <- function(t.tot, J, C, true.items, min.a, max.a, mu.b,
       b.col <- a.col + 1
       for (i in first.unique.i:last.unique.i) {
         # Generates item parameters for unique items
-        true.items[i, a.col] <- genItemParameter("a", c(min.a, max.a))
-        true.items[i, b.col] <- genItemParameter("b", c(mu.b, sd.b))
+        true.items[i, a.col] <- genItemParameter("a", c(min.a, max.a), ...)
+        true.items[i, b.col] <- genItemParameter("b", c(mu.b, sd.b), ...)
       }
 
       # Takes some items from linked form

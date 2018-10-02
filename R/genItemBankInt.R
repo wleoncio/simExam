@@ -15,13 +15,14 @@
 #' @param linkage.plan square matrix or order t.tot representing the number of
 #'   items each form has in common with another form. If NULL, links between
 #'   forms will be chosen randomly.
+#' @param ... parameters to pass to child functions
 #' @importFrom stats runif rnorm complete.cases
 #' @importFrom Matrix tril
 #' @return list containing 2PL item parameters per form
 #' @export
 genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
                            leading0 = TRUE, num.digits = 4,
-                           linkage.plan = NULL) {
+                           linkage.plan = NULL, ...) {
   if (missing(C)) C <- NA
   if (missing(J)) J <- NA
   if (!is.null(linkage.plan)) {
@@ -50,7 +51,7 @@ genItemBankInt <- function(C, J, t.tot, min.a, max.a, mu.b, sd.b,
   # Expand linkage plan
   if (is.null(linkage.plan)) {
     items <- fillRandomLinkagePlan(t.tot, J, C, true.items, min.a, max.a,
-                                   mu.b, sd.b)
+                                   mu.b, sd.b, ...)
   } else {
     items <- fillCustomLinkagePlan(t.tot, true.items, linkage.plan,
                                    min.a, max.a, mu.b, sd.b)

@@ -12,10 +12,10 @@
 #' @param mu.b Mean of (normally-distributed) item difficulty parameter
 #' @param sd.b Standard deviation of (normally-distributed) item difficulty
 #'   parameter
-#'
+#' @param ... Arguments to pass to genItemParameter
 #' @export
 fillCustomLinkagePlan <- function(t.tot, true.items, linkage.plan,
-                                  min.a, max.a, mu.b, sd.b) {
+                                  min.a, max.a, mu.b, sd.b, ...) {
   common.unique.items <- linkage.plan
   J <- linkage.plan[1, 1]
   for (t in seq(nrow(common.unique.items))) {
@@ -32,9 +32,9 @@ fillCustomLinkagePlan <- function(t.tot, true.items, linkage.plan,
     num.unique.items <- common.unique.items[t.ref, t.ref]
     last.item.to.use <- first.unused.item + num.unique.items - 1
     true.items[first.unused.item:last.item.to.use, a.col.ref] <-
-      genItemParameter("a", c(min.a, max.a), num.unique.items)
+      genItemParameter("a", c(min.a, max.a), num.unique.items, ...)
     true.items[first.unused.item:last.item.to.use, b.col.ref] <-
-      genItemParameter("b", c(mu.b, sd.b), num.unique.items)
+      genItemParameter("b", c(mu.b, sd.b), num.unique.items, ...)
     if (t.ref < t.tot) {
       for (t.link in (t.ref + 1):t.tot) {
         if (common.unique.items[t.ref, t.link] > 0) {
@@ -45,9 +45,9 @@ fillCustomLinkagePlan <- function(t.tot, true.items, linkage.plan,
           num.common.items <- common.unique.items[t.ref, t.link]
           last.item.to.use <- first.unused.item + num.common.items - 1
           true.items[first.unused.item:last.item.to.use, c(a.col.ref, a.col.link)] <-
-            genItemParameter("a", c(min.a, max.a), num.common.items)
+            genItemParameter("a", c(min.a, max.a), num.common.items, ...)
           true.items[first.unused.item:last.item.to.use, c(b.col.ref, b.col.link)] <-
-            genItemParameter("b", c(mu.b, sd.b), num.common.items)
+            genItemParameter("b", c(mu.b, sd.b), num.common.items, ...)
         }
       }
     }
