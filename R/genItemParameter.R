@@ -20,8 +20,8 @@ genItemParameter <- function(type, parms, quantity = 1,
     item.parameter <- msm::rtnorm(n     = quantity,
                                   mean  = parms[1],
                                   sd    = parms[2],
-                                  lower = truncate[1],
-                                  upper = truncate[2])
+                                  lower = truncate.b[1],
+                                  upper = truncate.b[2])
   } else {
     stop("type must be 'a' or 'b'.")
   }
