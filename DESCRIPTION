@@ -6,6 +6,7 @@ Author: Waldir Leoncio <waldir.leoncio@gmail.com>
 Maintainer: Waldir Leoncio <waldir.leoncio@gmail.com>
 Description: Simulates test results for IRT and related applications.
 Imports: stats, Matrix, msm
+Issues: https://github.com/wleoncio/simExam/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
